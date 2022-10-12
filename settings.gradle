@@ -1,0 +1,3 @@
+rootProject.name = "MzkAndroid"
+include ':app'
+include ':lib_base'

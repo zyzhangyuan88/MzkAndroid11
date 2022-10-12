@@ -1,0 +1,140 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-parcelize'
+}
+
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+android {
+    compileSdk rootProject.ext.android.compileSdk
+
+    defaultConfig {
+        applicationId "com.maizhi.mzk.app"
+        minSdk rootProject.ext.android.minSdk
+        targetSdk rootProject.ext.android.targetSdk
+        versionCode rootProject.ext.android.versionCode
+        versionName rootProject.ext.android.versionName
+
+        ndk {
+            // 设置支持的SO库架构，以微信为基准只支持arm64-v8a即可，可以达到缩包的目的
+            abiFilters 'arm64-v8a'//, 'armeabi'//, 'armeabi-v7a', 'x86', 'x86_64'
+        }
+
+        // 只保留汉语资源
+        resConfigs('zh-rCN')
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['keyPassword']
+            keyAlias  keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['storePassword']
+        }
+
+        release {
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['keyPassword']
+            keyAlias  keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['storePassword']
+        }
+    }
+
+
+    buildTypes {
+        debug {
+            // 设置调试时包名后添加debug以防止与正式版安装冲突
+//            applicationIdSuffix '.debug'
+
+            // 假如打包后运行闪退，可以在调试模式下打开混淆查看日志找出混淆问题
+            minifyEnabled false // 开启混淆
+            shrinkResources false // 启动资源压缩
+            zipAlignEnabled false // 开启zipalign优化
+
+            signingConfig signingConfigs.debug
+
+//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+        release {
+
+            minifyEnabled true // 开启混淆
+            shrinkResources true // 启动资源压缩
+            zipAlignEnabled true // 开启zipalign优化
+
+            //签名
+            signingConfig signingConfigs.release
+
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            applicationVariants.all { variant ->
+                variant.outputs.all { output ->
+                    // 输出apk名称为：App名_版本名.apk
+                    outputFileName = "mzk_v_${defaultConfig.versionName}.apk"
+                }
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    buildFeatures {
+        dataBinding true
+    }
+}
+
+dependencies {
+
+    implementation project(path: ':lib_base')
+
+    implementation rootProject.ext.dependencies.banner
+
+    api rootProject.ext.dependencies.junit
+    api rootProject.ext.dependencies.junitExt
+    api rootProject.ext.dependencies.espresso
+
+    api rootProject.ext.dependencies.coreKtx
+    api rootProject.ext.dependencies.appcompat
+    api rootProject.ext.dependencies.material
+    api rootProject.ext.dependencies.constraintlayout
+
+    // jetpack
+    api rootProject.ext.dependencies.viewModelKtx
+    api rootProject.ext.dependencies.liveDataKtx
+    api rootProject.ext.dependencies.lifecycleKtx
+
+    // UI相关
+    api rootProject.ext.dependencies.swiperefreshlayout
+    api rootProject.ext.dependencies.recyclerview
+    api rootProject.ext.dependencies.BaseRecyclerViewAdapterHelper
+    api rootProject.ext.dependencies.materialDialogsCore
+    api rootProject.ext.dependencies.materialDialogsLifecycle
+    api rootProject.ext.dependencies.materialDialogsbottomsheets
+
+    // 存储相关
+    api rootProject.ext.dependencies.mmkv
+
+    // 图片
+    api rootProject.ext.dependencies.glide
+
+    // 网络相关
+    api rootProject.ext.dependencies.retrofit
+    api rootProject.ext.dependencies.converterGson
+    api rootProject.ext.dependencies.loggingInterceptor
+    api rootProject.ext.dependencies.PersistentCookieJar
+
+
+
+}

@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">MzkAndroid</string>
+
+    <string name="tab_home">首页</string>
+    <string name="tab_mall">商城</string>
+    <string name="tab_monitor">监测</string>
+    <string name="tab_service">服务</string>
+    <string name="tab_mine">我的</string>
+
+    <string name="toast_double_back_exit">再按一次退出程序</string>
+
+</resources>
